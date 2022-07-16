@@ -57,8 +57,9 @@ int main(){
     string tempFirstName, tempLastName, tempID;
     double tempNumber;
 
-    //object to read
-    std::ifstream file;
+    //object to read/write
+    std::ifstream infile;
+    std::ofstream outfile;
 
     //create vector of members
     vector<Members*> members;
@@ -74,31 +75,60 @@ while(choice != 5){ //stay in loop until user exits
 
         cout << "Enter choice: ";
         cin >> choice;
+        cout << endl << endl;
 
 
         switch(choice){
             case 1:
                 cout << "case 1" << endl;
+                //open file object, output mode at the end of file
+                outfile.open("data.txt", std::ofstream::app);
+
+                //get data for output to file
+                if(outfile.is_open()){
+                    cout << "Enter first name: ";
+                    cin >> tempFirstName;
+                    cout << endl << "Enter last name: ";
+                    cin >> tempLastName;
+                    cout << endl << "Enter member ID: ";
+                    cin >> tempID;
+                    if(tempID.at(0) == 1)
+                        cout << endl << "Enter salary: ";
+                    else
+                        cout << endl << "Enter GPA: ";
+                    cin >> tempNumber;
+                        
+                    outfile << "\n\n" << tempFirstName << " " << tempLastName << " " << tempID << " " << tempNumber;
+
+                    outfile.close();
+                }
+                else
+                    cout << "Can't open file" << endl;
+                
             break;
 
             case 2:
                 //open file object, input mode
-                file.open("data.txt", std::ifstream::in);
+                infile.open("data.txt", std::ifstream::in);
 
                 //read into members
-                file.read((char*) &members, members.size());
+                infile.read((char*) &members, members.size());
+
+                cout << "SEG FAULT???" << endl << endl;
 
                 //set the data
-                while(!file.eof() && !file.fail()){
-                    file >> tempFirstName;
-                    file >> tempLastName;
-                    file >> tempID;
-                    file >> tempNumber;
+                while(!infile.eof() && !infile.fail()){
+                    infile >> tempFirstName;
+                    infile >> tempLastName;
+                    infile >> tempID;
+                    infile >> tempNumber;
                     if(tempID.at(0) == '1')
                         members.push_back(new Faculty(tempFirstName, tempLastName, tempID, tempNumber));
                     else if(tempID.at(0) == '9')
                         members.push_back(new Student(tempFirstName, tempLastName, tempID, tempNumber));
                 }
+
+                cout << "SEG FAULT???" << endl << endl;
 
                 for(size_t i = 0; i < members.size(); i++){
                     members[i]->print();
@@ -106,7 +136,9 @@ while(choice != 5){ //stay in loop until user exits
 
                 for(size_t i = 0; i < members.size(); i++){
                     delete members[i];
-                }
+                } 
+
+                infile.close();
             break;
 
             case 3:
